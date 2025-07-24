@@ -1,3 +1,4 @@
+const messages = require("../Constant/messages");
 const { generateToken } = require("../Helper/JwtHelper");
 const { sendResponse } = require("../Helper/ResponseHelper");
 const validate = require("../Helper/ValidationHelper");
@@ -21,15 +22,15 @@ exports.verifyEmailOtp = async (req, res) => {
     const otpRecord = await Otp.findOne({ email });
 
     if (!otpRecord) {
-      return sendResponse(res, {}, "OTP not requested", 422);
+      return sendResponse(res, {}, messages.OTP.OTP_NOT_REQUESTED, 422);
     }
 
     if (otpRecord.otpExpiry < Date.now()) {
-      return sendResponse(res, {}, "OTP has expired", 422);
+      return sendResponse(res, {}, messages.OTP.OTP_EXPIRED, 401);
     }
 
     if (otpRecord.otp !== String(otp)) {
-      return sendResponse(res, {}, "Invalid OTP", 422);
+      return sendResponse(res, {}, messages.OTP.OTP_INVALID, 422);
     }
 
     // Optional: delete the OTP record after successful verification

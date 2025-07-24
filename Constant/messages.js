@@ -16,6 +16,8 @@ const messages = {
     USER_ALREADY_CREATED: "user already created",
     TOKEN_MISSING: "Authentication token is missing.",
     TOKEN_INVALID: "Invalid token",
+    EMAIL_FAILED: "Email is required",
+    MOBILE_ALREADY_IN_USE: "Mobile number already in use",
   },
   GENERAL: {
     SERVER_ERROR: "something went wrong",
@@ -26,6 +28,14 @@ const messages = {
   OTP: {
     OTP_SEND: "OTP send",
     OTP_FAILED: "Failed to send OTP",
+    OTP_SEND_USER: "OTP sent to email",
+    OTP_NOT_REQUESTED: "OTP not requested",
+    OTP_EXPIRED: "OTP has expired",
+    OTP_INVALID:"Invalid OTP"
+  },
+  POST: {
+    POST_CREATED: "Post created successfully",
+    POST_FETCHED: "Posts fetched successfully",
   },
 };
 

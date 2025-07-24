@@ -8,8 +8,10 @@ const validate = require("../Helper/ValidationHelper");
 const { sendEmail } = require("../Helper/MailHelper");
 
 module.exports = {
+  // Register User
   registerUser: async (req, res) => {
     try {
+       // Validation rules for Register input fields
       const validationRules = {
         name: "required|string",
         email: "required|email",
@@ -28,17 +30,18 @@ module.exports = {
       const { name, email, password, mobile, address, status, hobbies } =
         req.body;
 
+      // Check if User already exist in the Database
       const existingUser = await User.findOne({ email });
 
       if (existingUser) {
         return sendResponse(res, {}, messages.AUTH.USER_ALREADY_CREATED, 404);
       }
-
+      // Check if Mobile Number Already in Database
       const existingUserByMobile = await User.findOne({ mobile });
       if (existingUserByMobile) {
-        return sendResponse(res, {}, "Mobile number already in use", 409);
+        return sendResponse(res, {}, messages.AUTH.MOBILE_ALREADY_IN_USE, 409);
       }
-
+      
       const newUser = new User({
         name,
         email,
@@ -48,7 +51,8 @@ module.exports = {
         status,
         hobbies,
       });
-
+      
+      // Save User in Database
       await newUser.save();
 
       const payload = {
@@ -56,7 +60,7 @@ module.exports = {
         email: newUser.email,
         name: newUser.name,
       };
-
+      // Generate Token
       const token = generateToken(payload);
 
       return sendResponse(
@@ -69,8 +73,11 @@ module.exports = {
       return sendResponse(res, {}, error.message, 500);
     }
   },
+  // login User
   loginUser: async (req, res) => {
     try {
+
+      // Validation rules for login input fields
       const loginValidationRules = {
         email: "required|email",
         password: "required|string|minLength:6|maxLength:32",
@@ -83,17 +90,21 @@ module.exports = {
 
       const { email, password } = req.body;
       const user = await User.findOne({ email });
-
+      
+      // Check if the user exists in the database
       if (!user) {
         return sendResponse(res, {}, messages.AUTH.USER_NOT_FOUND, 422);
       }
 
+      // Compare Password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return sendResponse(res, {}, messages.AUTH.UNAUTHORIZED, 422);
       }
 
       const payload = { id: user._id, email: user.email, name: user.name };
+
+      // Generate Token
 
       const token = generateToken(payload);
 
@@ -107,8 +118,12 @@ module.exports = {
       return sendResponse(res, {}, error.message, 500);
     }
   },
+
+  // Forgot Password
   forgotPassword: async (req, res) => {
     try {
+
+      // validation rule for Forgot Password field
       const EmailValidationRules = {
         email: "required|email",
       };
@@ -120,8 +135,10 @@ module.exports = {
 
       const { email } = req.body;
 
+      // Check if email is provided by the User
+
       if (!email) {
-        return sendResponse(res, {}, "Email is required", 422);
+        return sendResponse(res, {}, messages.AUTH.EMAIL_FAILED, 422);
       }
 
       const user = await User.findOne({ email });

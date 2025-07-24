@@ -8,6 +8,8 @@ module.exports = {
   // Add user
   addUser: async (req, res) => {
     try {
+
+      // Validate rule for Adding user
       const validationRules = {
         name: "required|string",
         email: "required|email",
@@ -43,6 +45,8 @@ module.exports = {
         name: newUser.name,
         email: newUser.email,
       };
+
+      //Generate Token
 
       const token = generateToken(payload);
 

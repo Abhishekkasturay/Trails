@@ -24,41 +24,56 @@ module.exports = {
     }
   },
   //Get All Post
+  // getAllPosts: async (req, res) => {
+  //   try {
+
+  //     let filter  = {}
+  //     if(search){
+  //       filter.title = search
+  //       filter.name = search
+  //     }
+  //     if(userId){
+  //       filter.user = userId
+  //     }
+  //     const posts = await PostSchema.find(filter).populate(
+  //       "user",
+  //       "name _id"
+  //     );
+
+  //     return sendResponse(res, posts, messages.POST.POST_FETCHED, 200);
+  //   } catch (error) {
+  //     console.log("error", error);
+  //     return sendResponse(res, {}, messages.GENERAL.SERVER_ERROR, 500);
+  //   }
+  // },
+
   getAllPosts: async (req, res) => {
     try {
-      const posts = await PostSchema.find({}, { _id: 0, __v: 0 }).populate(
-        "user",
-        "name _id"
-      );
+      const { search, userId } = req.query;
 
-      return sendResponse(res, posts, messages.POST.POST_FETCHED, 200);
-    } catch (error) {
-      console.log("error", error);
-      return sendResponse(res, {}, messages.GENERAL.SERVER_ERROR, 500);
-    }
-  },
+      const filter = {};
 
-  // Get Post by User
-  getPostByUser: async (req, res) => {
-    try {
-      const userId = new mongoose.Types.ObjectId(req.params.userId);
-      const { title, name } = req.query;
-
-      const filter = { user: userId };
-
-      if (title) {
-        filter.title = title; // exact match
+      // Apply userId filter if passed
+      if (userId) {
+        filter.user = userId;
       }
 
-      const posts = await PostSchema.find(filter, { _id: 0, __v: 0 }).populate({
+      // Build regex filter for title or description
+      if (search) {
+        const searchRegex = new RegExp(search, "i"); // case-insensitive
+        filter.$or = [
+          { title: { $regex: searchRegex } },
+          { description: { $regex: searchRegex } },
+        ];
+      }
+
+      // Initial DB query with filters
+      const posts = await PostSchema.find(filter).populate({
         path: "user",
         select: "name _id",
-        match: name ? { name: name } : {}, // match user.name if provided
       });
 
-      const filteredPosts = posts.filter((post) => post.user !== null);
-
-      return sendResponse(res, filteredPosts, "data fetched", 200);
+      return sendResponse(res, posts, messages.POST.POST_FETCHED, 200);
     } catch (error) {
       console.log("error", error);
       return sendResponse(res, {}, messages.GENERAL.SERVER_ERROR, 500);

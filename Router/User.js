@@ -7,17 +7,13 @@ const {
   getProfile,
   updateProfile,
 } = require("../Controllers/SettingsControllers");
-const {
-  createPost,
-  getAllPosts,
-  getPostByUser,
-} = require("../Controllers/PostControllers");
+const { createPost, getAllPosts } = require("../Controllers/PostControllers");
 
 router.post("/update-password", authMiddleware, updatePassword);
 router.get("/user-profile", authMiddleware, getProfile);
 router.put("/update-profile", authMiddleware, updateProfile);
 router.post("/create-post", authMiddleware, createPost);
 router.get("/get-post", getAllPosts);
-router.get("/get-post/:userId", getPostByUser);
+router.get("/get-post/:userId", getAllPosts);
 
 module.exports = router;

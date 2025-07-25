@@ -3,12 +3,11 @@ const { sendResponse } = require("../Helper/ResponseHelper");
 const User = require("../Models/UserSchema");
 
 module.exports = {
-
   // Get User Profile
   getProfile: async (req, res) => {
     try {
       const user = await User.findById(req.user.id);
-    
+
       // Check User Exist in Database
 
       if (!user) {
@@ -51,7 +50,7 @@ module.exports = {
         { name, mobile, address, hobbies },
         { new: true }
       );
-      
+
       // failed to update User not found
       if (!updateUser) {
         return sendResponse(res, {}, messages.USER.NOT_FOUND, 422);

@@ -13,7 +13,7 @@ router.post("/update-password", authMiddleware, updatePassword);
 router.get("/user-profile", authMiddleware, getProfile);
 router.put("/update-profile", authMiddleware, updateProfile);
 router.post("/create-post", authMiddleware, createPost);
-router.get("/get-post", getAllPosts);
-router.get("/get-post/:userId", getAllPosts);
+router.get("/get-post", authMiddleware, getAllPosts);
+router.get("/get-post/:userId", authMiddleware, getAllPosts);
 
 module.exports = router;

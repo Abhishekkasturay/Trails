@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema(
     userId: String,
     title: String,
     description: String,
-    //media
+    media: [String],
     status: Boolean,
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },

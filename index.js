@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const fileUpload = require("express-fileupload");
 require("dotenv").config();
 const Port = 3000;
 const authRoutes = require("./Router/Auth");
@@ -17,6 +18,8 @@ const connectDB = require("./Config/db");
 connectDB();
 
 app.use(express.json());
+app.use(fileUpload());
+app.use("/uploads", express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.send("hello");

@@ -60,10 +60,10 @@ module.exports = {
         ];
       }
 
-      // Default sort is latest first (descending)
       const sortOrder = sort === "old" ? 1 : -1;
 
       const posts = await PostSchema.aggregate([
+        // Join User
         {
           $lookup: {
             from: "users",
@@ -73,7 +73,31 @@ module.exports = {
           },
         },
         { $unwind: "$user" },
+
+        // Match filter
         { $match: matchFilter },
+
+        // Join Comments
+        {
+          $lookup: {
+            from: "comments",
+            localField: "_id",
+            foreignField: "postId",
+            as: "comments",
+          },
+        },
+
+        // Join Likes
+        {
+          $lookup: {
+            from: "likes",
+            localField: "_id",
+            foreignField: "postId",
+            as: "likes",
+          },
+        },
+
+        // Final projection
         {
           $project: {
             title: 1,
@@ -82,11 +106,22 @@ module.exports = {
             media: 1,
             "user._id": 1,
             "user.name": 1,
+            totalComments: { $size: "$comments" },
+            totalLikes: {
+              $size: {
+                $filter: {
+                  input: "$likes",
+                  as: "like",
+                  cond: { $eq: ["$$like.isLiked", true] },
+                },
+              },
+            },
           },
         },
+
+        // Sort
         { $sort: { createdAt: sortOrder } },
       ]);
-      console.log("posts", posts);
 
       return sendResponse(res, posts, messages.POST.POST_FETCHED, 200);
     } catch (error) {
